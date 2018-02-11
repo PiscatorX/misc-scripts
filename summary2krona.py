@@ -12,11 +12,13 @@ class Summary2Krona(object):
         parser = argparse.ArgumentParser("Save Qiime summary taxa(*.txt) file to Krona text for import")
         parser.add_argument('qiime_summary')
         parser.add_argument('-p','--prefix', default="D_L__",help = "prefix 'L' for digits (default 0-9)")
+        parser.add_argument('-o','--outfile')
         args = parser.parse_args()
         self.qiime_summary = args.qiime_summary
         self.prefix = args.prefix.replace('L','{}')
         self.summary_data = open(self.qiime_summary).read()
-        self.krona_file = '_'.join(['krona', self.qiime_summary])
+        
+        self.krona_file = args.outfile if args.outfile else  '_'.join(['krona', self.qiime_summary])
 
         
     def parse2krona(self):
