@@ -42,7 +42,6 @@ long : 18.10633
         self.file_units = False
         self.csv_save = args.csv_save
         self.time = args.time
-        print args
         if self.time:
             self.time_fobj = open(self.time, "w")
             print >> self.time_fobj,"Date,time"
@@ -54,7 +53,7 @@ long : 18.10633
         for csv_fname  in self.csv_files:
             print csv_fname
             self.parse_csv(csv_fname)    
-        self.ctd_all = pd.concat(self.ctd_dataframes)
+        self.ctd_all = pd.concat(self.ctd_dataframes, ignore_index=True)
         
             
         
@@ -84,8 +83,8 @@ long : 18.10633
                        for param, reading in zip(col_header, row):
                            data[param].append(reading)
             df = pd.DataFrame(data)
-            for idx, (col, value)  in enumerate(self.metavars.items()):
-                df.insert(idx, col, value)
+            for i,(col, value)  in enumerate(self.metavars.items()):
+                df.insert(i, col, value)
             self.ctd_dataframes.append(df)
 
        
@@ -125,7 +124,7 @@ long : 18.10633
             csv_writer = csv.writer(fp)
             csv_writer.writerow(self.file_header)
             #csv_writer.writerow([ '' for _ in self.metavars.keys() ] +  self.file_units)    
-        self.ctd_all.to_csv(self.csv_save, header=False, mode='a')
+        self.ctd_all.to_csv(self.csv_save, header=False, mode='a', index=False)
         if self.time:
             self.time_fobj.close() 
         print "\nCTD data sucessefully saved to ", self.csv_save
