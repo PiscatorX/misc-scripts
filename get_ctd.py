@@ -10,7 +10,12 @@ import datetime
 
 
 class GetCTD(object):
+    """
+    
+      gets a list of files and generates on long ctd file with time
 
+    """
+    
     def __init__(self):
         
         parser = argparse.ArgumentParser("generate ODV file")
@@ -24,6 +29,7 @@ long : 18.10633
  """)
         parser.add_argument('-g', '--glob_pattern', default="*St6.csv", help = "file pattern with wild cards matching files to be processed")
         parser.add_argument('-o', '--csv_save', default="ctd_all.csv", help = "output file to save data")
+        parser.add_argument('-t', '--time', help = "output file to save date and times ")
         args = parser.parse_args()
         self.metavars = collections.OrderedDict([ line.strip().split('=')
                                for line in open(args.metavars).read().splitlines()
@@ -35,6 +41,11 @@ long : 18.10633
         self.file_header = False
         self.file_units = False
         self.csv_save = args.csv_save
+        self.time = args.time
+        print args
+        if self.time:
+            self.time_fobj = open(self.time, "w")
+            print >> self.time_fobj,"Date,time"
         #YEAR,MONTH,DAY,HOUR,MINUTE,SEC
 
         
@@ -58,11 +69,14 @@ long : 18.10633
                         date, time = filter(any, row)
                         d, t  = self.get_time(date, time)
                         map(self.metavars.update, [d, t])
+                        
                     elif i == 1:
                         col_header = self.dedup(map(self.strip_comma, row))
                         data = dict((param,[]) for param in  col_header)
                         if not self.file_header:
-                            self.file_header =  col_header
+                            self.file_header = self.metavars.keys() + col_header
+                            
+                            
                     elif i == 2:
                         if not self.file_units:
                             self.file_units = row
@@ -80,12 +94,18 @@ long : 18.10633
         dt_obj = datetime.datetime.strptime(date,'%d-%b-%y')
         time_str = str(datetime.timedelta(seconds=float(time)))
         time_obj = datetime.datetime.strptime(time_str, '%H:%M:%S')
+        
         d = collections.OrderedDict(map(lambda v: (v, getattr(dt_obj, v)), ['year','month','day']))
         t =  collections.OrderedDict(map(lambda v: (v, getattr(time_obj, v)), ['hour','minute','second']))
+        print >> self.time_fobj,"{},{}".format(dt_obj.strftime("%d/%m/%y"),time_str)
         return d, t
         
     def dedup(self, dup_list):
+        
+        """
+           Fix duplicate headers by apppending numbers to headers
 
+        """
         dup_counter = collections.defaultdict(int)
         deduped_list = []
         for var in dup_list:
@@ -104,8 +124,10 @@ long : 18.10633
         with open(self.csv_save, 'w') as fp:
             csv_writer = csv.writer(fp)
             csv_writer.writerow(self.file_header)
-            csv_writer.writerow(self.file_units)    
+            #csv_writer.writerow([ '' for _ in self.metavars.keys() ] +  self.file_units)    
         self.ctd_all.to_csv(self.csv_save, header=False, mode='a')
+        if self.time:
+            self.time_fobj.close() 
         print "\nCTD data sucessefully saved to ", self.csv_save
         
 
