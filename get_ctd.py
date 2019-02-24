@@ -14,12 +14,20 @@ class GetCTD(object):
     def __init__(self):
         
         parser = argparse.ArgumentParser("generate ODV file")
-        parser.add_argument('-m', '--metavars', default="ctd.metavars", help = "config file with default values")
+        parser.add_argument('-m', '--metavars', default="ctd.metavars", help = """config file with default values example:
+
+cruise = St Helena Bay   
+station = St06  
+lat = -32.75323 
+long = 18.10633
+
+ """)
+        parser.add_argument('-g', '--glob_pattern', default="*St6.csv'", help = "file pattern with wild cards matching files to be processed")
         args = parser.parse_args()
         self.metavars = collections.OrderedDict([ line.strip().split('=')
                                for line in open(args.metavars).read().splitlines()
                                if any(line) ])
-        self.csv_files  = glob.glob('*St6.csv')
+        self.csv_files  = glob.glob(args.glob_pattern)
         self.strip_comma = lambda x: x.replace(',','')
         self.ctd_dataframes = []
         self.file_header = False
