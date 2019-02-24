@@ -14,25 +14,27 @@ class GetCTD(object):
     def __init__(self):
         
         parser = argparse.ArgumentParser("generate ODV file")
-        parser.add_argument('-m', '--metavars', default="ctd.metavars", help = """config file with default values example:
+        parser.add_argument('-m', '--metavars', default="ctd.metavars", required= True, help = """config file (yaml format) with default values on each line  example:
 
-cruise = St Helena Bay   
-station = St06  
-lat = -32.75323 
-long = 18.10633
+cruise: St Helena Bay   
+station: St06  
+lat : -32.75323 
+long : 18.10633
 
  """)
-        parser.add_argument('-g', '--glob_pattern', default="*St6.csv'", help = "file pattern with wild cards matching files to be processed")
+        parser.add_argument('-g', '--glob_pattern', default="*St6.csv", help = "file pattern with wild cards matching files to be processed")
+        parser.add_argument('-o', '--csv_save', default="ctd_all.csv", help = "output file to save data")
         args = parser.parse_args()
         self.metavars = collections.OrderedDict([ line.strip().split('=')
                                for line in open(args.metavars).read().splitlines()
                                if any(line) ])
         self.csv_files  = glob.glob(args.glob_pattern)
+        assert any(self.csv_files), "No files matching glob {} ".format(args.glob_pattern)
         self.strip_comma = lambda x: x.replace(',','')
         self.ctd_dataframes = []
         self.file_header = False
         self.file_units = False
-        self.csv_save = 'ctd_all.csv'
+        self.csv_save = args.csv_save
         #YEAR,MONTH,DAY,HOUR,MINUTE,SEC
 
         
@@ -104,8 +106,8 @@ long = 18.10633
             csv_writer.writerow(self.file_header)
             csv_writer.writerow(self.file_units)    
         self.ctd_all.to_csv(self.csv_save, header=False, mode='a')
-
-
+        print "\nCTD data sucessefully saved to ", self.csv_save
+        
 
         
 ctd = GetCTD()
