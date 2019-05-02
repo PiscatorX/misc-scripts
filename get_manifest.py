@@ -13,6 +13,7 @@ def gen_manifest(read_dir, manifest, pattern):
     pattern = ''.join([read_dir,leading,'[',read_chars, ']',trailing ])
     direction = itertools.cycle(['forward','reverse'])
     manifest_writer = csv.writer(manifest)
+    manifest_writer.writerow(['sample-id', 'absolute-filepath', 'direction'])
     for read_file in glob.iglob(pattern):
         base_fname = os.path.basename(read_file)
         sample_name = base_fname 
@@ -20,7 +21,7 @@ def gen_manifest(read_dir, manifest, pattern):
            pattern_string = ''.join([leading.replace('*',''), char, trailing.replace('*','')])
            if base_fname.endswith(pattern_string):
                sample_name = base_fname.replace(pattern_string,'',1)
-        manifest_writer.writerow([sample_name, read_file, next(direction)])
+        manifest_writer.writerow([sample_name, os.path.abspath(read_file), next(direction)])
     manifest.close()
 
 if __name__ == '__main__':
