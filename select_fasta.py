@@ -3,35 +3,37 @@
 from Bio import SeqIO
 import argparse
 import sys
+import os
 
-def  parse_data(filename):
-    
+def  parse_data(filename, select, outfname):
+
+    select_list = open(args.select).read().splitlines()
     seq_data  = SeqIO.parse(open(filename), "fasta")
-    new_fobj = open('sel_'+filename,'w')
     select_seq_data =  []
     for rec in seq_data:
-        taxa_data = rec.description.split(';')
-        if in_list(taxa_data):
-            print taxa_data
+        if rec.id in  select_list:
+            sys.stderr.write(rec.id+"\n")
             select_seq_data.append(rec)
-    SeqIO.write(select_seq_data, new_fobj,'fasta')
-    new_fobj.close()
-
-    
-def in_list(taxa_data):
-
-    for word in select_list:
-        if algae in taxa_data:
-            return True
+            
+    if  outfname:
+        path, fname = os.path.split(outfname)
+        new_filename = os.path.join(path, fname)
+        if os.path.exists(new_filename):
+            raise Exception("File exists, try another file name")
+    else:
+        print("~~~")
+        path, fname = os.path.split(filename)
+        new_filename = 'extract_' + fname
+         
+    with open(new_filename, "w") as new_fobj:   
+        SeqIO.write(select_seq_data, new_fobj, 'fasta')
         
-    return False
-
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("get sequences with id similar to provided file")
-    parser.add_argument('reference', required=True, help = 'fasta reference file')
+    parser.add_argument('reference', help = 'fasta reference file')
     parser.add_argument('-s','--select', help = 'list of words to look for in fasta id info', required=True )
+    parser.add_argument('-o','--outfname', help = 'list of words to look for in fasta id info')
     args = parser.parse_args()
-    select_list = open(arg.select).read().splitlines()
-    parse_data(args.reference)
+    parse_data(args.reference, args.select, args.outfname)
