@@ -5,13 +5,21 @@ import argparse
 import sys
 import os
 
-def  parse_data(filename, select, outfname):
+def  parse_data(filename, select, description, outfname):
 
-    select_list = open(args.select).read().splitlines()
+    select_list =  [ line.lower() for line in open(args.select).read().splitlines() ]
+    
     seq_data  = SeqIO.parse(open(filename), "fasta")
     select_seq_data =  []
+    
     for rec in seq_data:
-        if rec.id in  select_list:
+        if description:
+            if rec.description.lower in select_list:
+                print(rec.description)
+                sys.stderr.write(rec.id+"\n")
+                select_seq_data.append(rec)
+                
+        elif rec.id in  select_list:
             sys.stderr.write(rec.id+"\n")
             select_seq_data.append(rec)
             
@@ -29,11 +37,11 @@ def  parse_data(filename, select, outfname):
         SeqIO.write(select_seq_data, new_fobj, 'fasta')
         
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("get sequences with id similar to provided file")
     parser.add_argument('reference', help = 'fasta reference file')
     parser.add_argument('-s','--select', help = 'list of words to look for in fasta id info', required=True )
+    parser.add_argument('-d','--description', action='store_true', help = 'search in words in description')
     parser.add_argument('-o','--outfname', help = 'list of words to look for in fasta id info')
     args = parser.parse_args()
-    parse_data(args.reference, args.select, args.outfname)
+    parse_data(args.reference, args.select, args.description, args.outfname)
