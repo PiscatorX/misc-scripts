@@ -5,7 +5,7 @@ import argparse
 def count(infile, infmt):
     
     seqx = SeqIO.parse(infile, infmt)
-    print("{} sequnces found!\n".format(len(list(seqx))))
+    print("{} sequences found!\n".format(len(list(seqx))))
 
 if  __name__ == '__main__':
     parser = argparse.ArgumentParser(description="show number of sequences")
