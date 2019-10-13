@@ -26,9 +26,9 @@ def rm_dot(args):
     dd_msa =  []
     for i,alignment in enumerate(msa,1):
         seq = SeqRecord(Seq(str(alignment.seq).replace(".","-"), generic_dna), id=alignment.id) 
-        dd_msa.append(alignment)
+        dd_msa.append(seq)
         
-    AlignIO.write(MultipleSeqAlignment(dd_msa), open(outfile,'w'), args.ofmt)
+    AlignIO.write(MultipleSeqAlignment(dd_msa), open(args.outfile,'w'), args.ofmt)
 
     
 if  __name__ == '__main__':
