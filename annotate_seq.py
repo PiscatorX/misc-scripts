@@ -16,11 +16,15 @@ def annotate_ref(seq_fobj, map_fobj,  informat, outfile_fobj, outformat):
         seq_id = seq.id
         seq.description = ''
         try:
-            genus, species = map_data[seq.id].split()
+            #genus, species = map_data[seq.id].split(" ",1)
+            tag = map_data[seq.id].split(" ",1)
+            #print(tag)
             #annotation = ''.join([genus[0]+'.',species,"[{}]".format(seq_id)])
             #annotation = "{}[{}]".format(map_data[align.id],seq_id)
-            annotation = "{}_{}".format(genus, species)
-            seq.id = annotation
+            #annotation = "{}_{}".format(genus, species)
+            #seq.id = annotation
+            seq.id = ''.join(tag)
+            print(seq.id)
         except KeyError:
             pass
         annotated_seq.append(seq)

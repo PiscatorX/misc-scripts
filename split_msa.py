@@ -13,16 +13,8 @@ def annotate_ref(msa_fobj, msa_informat, outfile_fobj, split, outformat):
     align1 = []
     align2 = []
     outfile_fobj2 =   open(outfile_fobj.name+'.2','w')
-    for i,align in enumerate(msa_data,1):
-        if (i <= split):
-           print(">{}".format(align.id), end =" ")
-           align1.append(align)
-        elif (i > split):
-           print(">{}".format(align.id), end =" ")
-           align2.append(align)
-        if (i  == split):print("\n")
-
-    print()
+    align1 = msa_data[:split]
+    align2 = msa_data[split:]
     AlignIO.write(AlignIO.MultipleSeqAlignment(align1),outfile_fobj, outformat)
     AlignIO.write(AlignIO.MultipleSeqAlignment(align2),outfile_fobj2, outformat)
     

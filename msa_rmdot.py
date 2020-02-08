@@ -10,7 +10,7 @@ import sys
 import os
 
 __author__ = "Andrew Ndhlovu"
-__copyright__ = "Copyright 2019"
+__copyright__ = "Copyright 2020"
 __license__ = "GPL"
 __version__ = "3"
 __maintainer__ = "Andrew Ndhlovu"
@@ -25,7 +25,7 @@ def rm_dot(args):
     msa  = AlignIO.read(args.infile, args.infmt)
     dd_msa =  []
     for i,alignment in enumerate(msa,1):
-        seq = SeqRecord(Seq(str(alignment.seq).replace(".","-"), generic_dna), id=alignment.id) 
+        seq = SeqRecord(Seq(str(alignment.seq).replace(".","-"), generic_dna), id=alignment.id,  description="") 
         dd_msa.append(seq)
         
     AlignIO.write(MultipleSeqAlignment(dd_msa), open(args.outfile,'w'), args.ofmt)
@@ -36,6 +36,6 @@ if  __name__ == '__main__':
     parser.add_argument('infile', action='store',  type=argparse.FileType('r'))
     parser.add_argument('-i','--in-format', dest='infmt', action='store', default='clustal', type=str)
     parser.add_argument('-f','--out-format', dest='ofmt', action='store', default='clustal', required=False, type=str)    
-    parser.add_argument('-o','--outfile', dest='outfile', action='store', type=str)
+    parser.add_argument('-o','--outfile', dest='outfile', action='store', type=str, required = True)
     args = parser.parse_args()
     rm_dot(args)

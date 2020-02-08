@@ -19,7 +19,7 @@ class ClipText(object):
                     if line.startswith(self.bottom):
                         break
             if start:
-                print(line)
+                print(line,end='')
             if line.startswith(self.top):
                 start = True
              

@@ -15,7 +15,7 @@ def annotate_ref(msa_fobj, map_fobj,  msa_informat, outfile_fobj, msa_outformat)
     for align in msa_data:
         seq_id = align.id
         try:
-            genus, species = map_data[align.id].split()
+            genus, species = map_data[align.id].split(" ",1)
             #annotation = ''.join([genus[0]+'.',species,"[{}]".format(seq_id)])
             #annotation = "{}[{}]".format(map_data[align.id],seq_id)
             annotation = "{} {}".format(genus, species)
@@ -30,7 +30,7 @@ def annotate_ref(msa_fobj, map_fobj,  msa_informat, outfile_fobj, msa_outformat)
     
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser("Generate ref file for Unipro fasta file")
+    parser = argparse.ArgumentParser("Annotate an msa file using a map file")
     parser.add_argument('msa_file',help ="multiple sequence alignment (MSA) file", type=argparse.FileType('r'))
     parser.add_argument('-m','--map', type=argparse.FileType('r'), required = True)
     parser.add_argument('-i','--informat', default="clustal", help ="MSA format")

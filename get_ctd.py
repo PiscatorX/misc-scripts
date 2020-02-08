@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+import numpy as np
 import os
 import csv
 import glob
@@ -40,7 +42,8 @@ long : 18.10633
         assert any(self.csv_files), "No files matching glob {} ".format(args.glob_pattern)
         self.strip_comma = lambda x: x.replace(',','')
         self.ctd_dataframes = []
-        
+        self.calibrate_flour = 'Chl-a'
+        self.calibrate_flour_unit = 'mg/m3'
         self.file_units = False
         self.csv_save = args.csv_save
         if os.path.exists(self.csv_save):
@@ -61,7 +64,15 @@ long : 18.10633
             self.parse_csv(csv_fname)    
         self.ctd_all = pd.concat(self.ctd_dataframes, ignore_index=True)
         
-            
+        self.ctd_all['Fluorescence'] = self.ctd_all['Fluorescence'].astype(float)
+        self.ctd_all['Pressure'] = self.ctd_all['Pressure'].astype(float)
+        n = self.ctd_all.columns.get_loc('Fluorescence') 
+        self.ctd_all.insert(n+1, self.calibrate_flour, (-0.351*np.log(self.ctd_all['Pressure']) + 2.1485)*(self.ctd_all['Fluorescence']))
+        j = self.col_header.index('Fluorescence')
+        self.col_header.insert(j+1, self.calibrate_flour)
+        self.file_units.insert(j+1, self.calibrate_flour_unit)
+        
+       
         
     def parse_csv(self, csv_fname):
 
