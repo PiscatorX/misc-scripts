@@ -11,10 +11,9 @@ def annotate_ref(msa_fobj, msa_informat, outfile_fobj, start, end, outformat):
 
     assert end >  start, "sequence end must greater than start"
     msa_data = AlignIO.read(msa_fobj, msa_informat)
-    align1 = []
-    for align in msa_data:
-        align1.append(align[start:end])
-    AlignIO.write(AlignIO.MultipleSeqAlignment(align1),outfile_fobj, outformat)
+    msa_clipped = msa_data[:, start:end]
+    
+    AlignIO.write(msa_clipped,outfile_fobj, outformat)
     
 
 if __name__ == '__main__':
