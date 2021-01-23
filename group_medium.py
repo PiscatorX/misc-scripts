@@ -12,15 +12,18 @@ def group_medium(fname, group, check_headers, sep, *variables):
     if check_headers:
         print("Columns:\t{}".format(data_df.columns))
         sys.exit(0)
-        
+    ren = lambda var: '_'.join(['median', var])
     for var in variables:
-        new_var = '_'.join(['median', var])
+        new_var = ren(var)
         data_df.loc[:,new_var] = pd.NA
         data_df[new_var] = data_df.groupby(group)[var].transform('median')
-        
+
+
+    data_df = data_df[[group] + list(map(ren, variables))]
+    data_df = data_df.drop_duplicates()
+    
     outfname = os.path.basename(fname.name)
-    #print(outfname)
-    data_df.to_csv('modified_' + outfname, sep = "\t")
+    data_df.to_csv('modified_' + outfname, sep = "\t",  index = False)
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("Annotate an msa file using a map file")
